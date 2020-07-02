@@ -1,0 +1,12 @@
+  # file: statuspage_user_creation_playbook.yml
+  - name: Manage the creation and the removal of a user account on StatusPage | Create a user account on StatusPage
+    
+  vars_files:
+    - ../roles/statuspage/vars/statuspage_auth_info.yml
+    - ../roles/statuspage/vars/statuspage_user_creation_data.yml
+  
+    hosts:
+    - localhost
+
+  tasks:
+    - import_tasks: ../roles/statuspage/tasks/statuspage_user_creation.yml

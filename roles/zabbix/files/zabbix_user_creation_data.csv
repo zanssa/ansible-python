@@ -1,0 +1,3 @@
+username,firstname,lastname,usergroups,password,type
+username1,test1,test11,Guests,123456,"Zabbix user"
+username2,test2,test22,"Guests,Zabbix administrators",123456,"Zabbix user"

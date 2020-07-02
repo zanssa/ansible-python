@@ -1,0 +1,27 @@
+# file: zabbix_user_creation.yml
+- name: Zabbix User Management | Create a user account on Zabbix
+  zabbix_user:
+    server_url: "{{ server_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    user_name: "{{ item.username }}"
+    name: "{{ item.firstname }}"
+    surname: "{{ item.lastname }}"
+    user_passwd: "{{ item.password }}"
+    user_groups: "{{ item.usergroups }}"
+    zabbix_user_type: "{{ item.type }}"
+    url: "http://172.17.0.2/zabbix.php?action=userprofile.edit"
+    medias:
+      - mediatype: 'PagerDuty'
+        sendto: 'username@example.com'
+        period: '1-7,00:00-24:00'
+        severity:
+          not_classified: yes
+          information: yes
+          warning: yes
+          average: no
+          high: yes
+          disaster: yes
+        active: 0
+    state: present
+  loop: "{{ csv_data }}"

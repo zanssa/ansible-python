@@ -1,0 +1,9 @@
+csv_data:
+- first_name: test
+  last_name: user
+  user_email: test1@test.com
+  user_password: '123456'
+- first_name: test2
+  last_name: user2
+  user_email: test2@test.com
+  user_password: '123456'

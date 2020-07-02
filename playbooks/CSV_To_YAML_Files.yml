@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  connection: local
+  name: Parsing a CSV file into A variable file 
+
+  tasks:
+    - name: Parsing a CSV file into A variable file
+      parsing_csv_into_ansible_vars:
+        csv_file: ../roles/statuspage/files/statuspage_user_creation_data.csv
+        yaml_file: ../roles/statuspage/vars/statuspage_user_creation_data.yml

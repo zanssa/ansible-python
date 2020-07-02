@@ -1,0 +1,12 @@
+# file: zabbix_user_removal.yml
+- name: Zabbix User Management | Delete a user account from Zabbix
+  zabbix_user: 
+    server_url: "{{ server_url }}"
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    user_name: "{{ item }}"
+    state: absent
+  loop:
+    - username1
+    - username2
+ 

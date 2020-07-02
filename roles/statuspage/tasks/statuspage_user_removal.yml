@@ -1,0 +1,30 @@
+# file: statuspage_user_removal.yml
+- name: Manage the creation and the removal of a user account on StatusPage | Get User ID
+  uri:
+    url: "{{ statuspage_api_user_creation }}"
+    method: GET
+    headers:
+        Authorization: "Authorization: OAuth {{ authorization_oauth }}"
+    body_format: json
+    status_code: 200
+    return_content: yes
+  register: get_users_response
+
+- name: Manage the creation and the removal of a user account on StatusPage | Print User ID returned from the previous task
+  debug:
+    var: get_users_response.json.id
+
+- name: Manage the creation and the removal of a user account on StatusPage | Set User ID returned as a variable for next task
+  set_fact:
+    user_id: get_users_response.json.id
+
+- name: Manage the creation and the removal of a user account on StatusPage | Delete a user account from StatusPage
+  uri:
+    url: "{{  }}"
+    method: DELETE
+    headers:
+        Authorization: "Authorization: OAuth {{ authorization_oauth }}"
+    body_format: json
+    body:
+    status_code: 200
+    return_content: yes

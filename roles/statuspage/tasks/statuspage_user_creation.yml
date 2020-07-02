@@ -1,0 +1,27 @@
+# file: statuspage_user_creation.yml
+- name: Manage the creation and the removal of a user account on StatusPage | Create a user account on StatusPage
+  uri:
+    url: "{{ statuspage_api_user_creation }}"
+    method: POST
+    headers:
+      Authorization: "Authorization: OAuth {{ authorization_oauth }}"
+    body_format: json
+    body:
+      user:
+        email: "{{ item.user_email }}"
+        password: "{{ item.user_password }}"
+        first_name: "{{ item.first_name }}"
+        last_name: "{{ item.last_name }}"
+    status_code: 201
+    return_content: yes
+  loop: "{{ csv_data }}" 
+  register: user_response
+
+- name: Manage the creation and the removal of a user account on StatusPage | Print out Users Ids Created in previous task 1
+  debug:
+    msg: "User ID: {{ user_response.json.id }}"
+  
+- name: Manage the creation and the removal of a user account on StatusPage | Print out Users Ids 2
+  debug:
+    msg: "User ID: {{ user_response.json.id }}"
+  loop: "{{ user_response }}"

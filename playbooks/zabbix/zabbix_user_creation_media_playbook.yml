@@ -1,0 +1,11 @@
+- name: Zabbix User Management | Create Users on Zabbix Server with Media Option
+
+  vars_files:
+    - ../roles/zabbix/vars/zabbix_login_info.yml
+    - ../roles/zabbix/vars/zabbix_user_creation_data.yml
+
+  hosts:
+    - localhost
+
+  tasks:
+    - import_tasks: ../roles/zabbix/tasks/zabbix_user_creation_media.yml
