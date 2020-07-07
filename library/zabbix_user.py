@@ -200,7 +200,7 @@ notes: supports_check_mode is allowed in this module
 '''
 EXAMPLES = '''
 - name: Create a new user or update an existing user's info
-  zabbix_user
+  zabbix_user:
     server_url: http://monitor.zabbix.com
     login_user: Admin
     login_passwd: Admin's passwd
