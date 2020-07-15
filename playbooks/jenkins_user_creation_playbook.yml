@@ -1,0 +1,12 @@
+  # file: jenkins_user_creation_playbook.yml
+- name: User Management on Jenkins Server | Create a User Account on Jenkins
+    
+  vars_files:
+    - ../roles/jenkins/vars/jenkins_auth_info.yml
+    - ../roles/jenkins/vars/jenkins_user_creation_data.yml
+  
+  hosts:
+    - localhost
+
+  tasks:
+    - import_tasks: ../roles/jenkins/tasks/jenkins_user_creation.yml
