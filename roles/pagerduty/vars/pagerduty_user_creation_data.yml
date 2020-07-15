@@ -1,0 +1,5 @@
+csv_data:
+- email: useremail@example.com
+  fullname: Full Name
+  role: responder
+  team: team1,team2

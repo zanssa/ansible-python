@@ -1,0 +1,13 @@
+# file: pagerduty_user_removal.yml
+- name: PagerDuty User Management | Remove a user account from PagerDuty
+  pagerduty_user:
+    access_token: "{{ api_access_token }}"
+    pd_user: "{{ item.fullname }}"
+    pd_email: "{{ item.email }}"
+    state: "absent"
+  loop: "{{ csv_data }}"
+  register: user_accounts
+
+- name: PagerDuty User Management | Print out a report for the change made by the previous task
+  debug:
+    msg: "{{ user_accounts | json_query('results[*].result') }}"
