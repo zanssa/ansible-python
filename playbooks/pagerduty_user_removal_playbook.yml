@@ -1,0 +1,12 @@
+# file: pagerduty_user_removal_playbook.yml
+- name: PagerDuty User Management | Remove a User Account from PagerDuty
+
+  vars_files:
+    - ../roles/pagerduty/vars/pagerduty_login_info.yml
+    - ../roles/pagerduty/vars/pagerduty_user_removal_data.yml
+
+  hosts:
+    - localhost
+
+  tasks:
+    - import_tasks: ../roles/pagerduty/tasks/pagerduty_user_removal.yml
