@@ -12,7 +12,9 @@
 
 - name: Manage the creation and the removal of a user account on StatusPage | Print User ID returned from the previous task
   debug:
-    var: get_users_response.json.id
+    var: get_users_response.json.id 
+  # this is based on the result returned when creating incidents but, 
+  # I would need to see the returned result to be able to filter out the result and get the user id for a specific user
 
 - name: Manage the creation and the removal of a user account on StatusPage | Set User ID returned as a variable for next task
   set_fact:
@@ -20,7 +22,7 @@
 
 - name: Manage the creation and the removal of a user account on StatusPage | Delete a user account from StatusPage
   uri:
-    url: "{{  }}"
+    url: "{{ statuspage_api_user_creation }}/{{ user_id }}"
     method: DELETE
     headers:
         Authorization: "Authorization: OAuth {{ authorization_oauth }}"

@@ -17,11 +17,8 @@
   loop: "{{ csv_data }}" 
   register: user_response
 
-- name: Manage the creation and the removal of a user account on StatusPage | Print out Users Ids Created in previous task 1
-  debug:
-    msg: "User ID: {{ user_response.json.id }}"
-  
 - name: Manage the creation and the removal of a user account on StatusPage | Print out Users Ids 2
   debug:
     msg: "User ID: {{ user_response.json.id }}"
-  loop: "{{ user_response }}"
+  # this is based on the result returned when creating incidents but, 
+  # I would need to see the returned result to be able to filter out the result and get the user id for a specific user
