@@ -1,0 +1,16 @@
+# file: jenkins_user_role_removal.yml
+- name: Jenkins User Management | Remove a Role from a Jenkins User
+  jenkins_user_role:
+    server_url: '{{ server_url }}'
+    api_token: '{{ api_access_token }}'
+    login_user: '{{ login_user }}'
+    jenkins_user: '{{ item.jenkins_user }}'
+    role_type: '{{ item.role_type }}'
+    role_name: '{{ item.role_name }}'
+    state: absent
+  loop: "{{ csv_data }}"
+  register: user_accounts
+
+- name: Jenkins User Management | Print out a report of the change made by the previous task
+  debug:
+    msg: "{{ user_accounts | json_query('results[*].result') }}"

@@ -3,7 +3,7 @@
   uri:
     url: http://{{ server_url }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)
     user: "{{ login_user }}"
-    password: "{{ api_token }}"
+    password: "{{ api_access_token }}"
     force_basic_auth: yes
     return_content: yes
   register: jenkins_crumb
@@ -12,7 +12,7 @@
   uri:
     url: 'http://{{ server_url }}/securityRealm/createAccountByAdmin'
     user: "{{ login_user }}"
-    password: "{{ api_token }}"
+    password: "{{ api_access_token }}"
     force_basic_auth: yes
     follow_redirects: all
     headers:
