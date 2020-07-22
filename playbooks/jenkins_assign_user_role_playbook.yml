@@ -1,0 +1,12 @@
+# file: jenkins_assign_user_role_playbook.yml
+- name: User Management on Jenkins Server | Assign a Role to a Jenkins User
+    
+  vars_files:
+    - ../roles/jenkins/vars/jenkins_auth_info.yml
+    - ../roles/jenkins/vars/jenkins_user_role_assignment_data.yml
+  
+  hosts:
+    - localhost
+
+  tasks:
+    - import_tasks: ../roles/jenkins/tasks/jenkins_assign_user_role.yml
