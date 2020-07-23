@@ -1,5 +1,5 @@
 csv_data:
-- email: useremail@example.com
-  fullname: Test User
+- email: example@example.com
+  fullname: Full Name
   password: '123456'
-  username: test
+  username: username

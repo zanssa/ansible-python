@@ -1,23 +1,29 @@
 # file: jenkins_user_removal.yml
 - name: User Management on Jenkins Server | Generate a CRUMB token to be used besides API token to authenticate and make the requested changes on Jenkins server
   uri:
-    url: http://{{ server_url }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)
+    url: '{{ server_url }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
     user: "{{ login_user }}"
-    password: "{{ api_token }}"
+    password: "{{ api_access_token }}"
     force_basic_auth: yes
     return_content: yes
+    validate_certs: no
+  environment:
+    https_proxy: "{{ proxy_server }}"
   register: jenkins_crumb
 
 - name: User Management on Jenkins Server | Delete a User Account from Jenkins
   uri:
-    url: 'http://{{ server_url }}/user/{{ item }}/doDelete'
+    url: '{{ server_url }}/user/{{ item }}/doDelete'
     user: "{{ login_user }}"
-    password: "{{ api_token }}"
+    password: "{{ api_access_token }}"
     force_basic_auth: yes
     follow_redirects: all
     headers:
         Jenkins-Crumb: "{{ jenkins_crumb.content.split(':')[1] }}"
         Cookie: "{{ jenkins_crumb.set_cookie }}"
     method: POST
+    validate_certs: no
+  environment:
+    https_proxy: "{{ proxy_server }}"
   loop:
-    - test
+    - username

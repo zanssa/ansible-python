@@ -3,6 +3,7 @@
   jenkins_user_role:
     server_url: '{{ server_url }}'
     api_token: '{{ api_access_token }}'
+    proxy_server: '{{ proxy_server }}'
     login_user: '{{ login_user }}'
     jenkins_user: '{{ item.jenkins_user }}'
     role_type: '{{ item.role_type }}'

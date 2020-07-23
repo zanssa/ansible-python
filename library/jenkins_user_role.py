@@ -36,6 +36,11 @@ options:
             - URL of a Jenkins server.
         required: true
         type: str
+    proxy_server: 
+        description:
+            - URL of a proxy server.
+        required: false
+        type: str
     jenkins_user:
         description:
             - Name of the user in Jenkins Server.
@@ -69,6 +74,7 @@ EXAMPLES = '''
     server_url: 'your_server_url:port_num'
     api_token: 'your_api_access_token'
     login_user: admin
+    proxy_server: proxy_server_url:port_num
     jenkins_user: example1
     role_type: global role
     role_name: authenticated
@@ -92,14 +98,15 @@ from ansible.module_utils.basic import AnsibleModule
 import requests, json, re
 
 class JenkinsUserRole(object):
-    def __init__(self, module, header):
+    def __init__(self, module, header, proxy):
         self._module = module
         self._jheader = header
+        self._proxy = proxy
 
     # check if the role name exists 
     def check_role_exists(self, server_url, login_user, access_token, role_type, role_name):
-        roles_name = requests.get('http://'+server_url+'/role-strategy/strategy/getAllRoles?type='+role_type, auth=(login_user,access_token),
-            headers=self._jheader)
+        roles_name = requests.get(server_url+'/role-strategy/strategy/getAllRoles?type='+role_type, auth=(login_user,access_token),
+            headers=self._jheader, proxies=self._proxy, verify=False)
         if roles_name.status_code == 200:
             roles_name = roles_name.json()
             for role in roles_name:
@@ -118,16 +125,16 @@ class JenkinsUserRole(object):
                 'roleName':role_name,
                 'sid':jenkins_user_id
             }
-            requests.post('http://'+server_url+'/role-strategy/strategy/assignRole',
-                auth=(login_user, access_token), headers=self._jheader, data=data)
+            requests.post(server_url+'/role-strategy/strategy/assignRole',
+                auth=(login_user, access_token), headers=self._jheader, proxies=self._proxy, verify=False, data=data)
 
         except Exception as e:
             self._module.fail_json(msg="Failed to assign a role to the user %s: %s" % (jenkins_user_id, e))
 
     # check if the role is assigned to the user
     def check_user_role_assignment(self, server_url, login_user, access_token, role_name, role_type, jenkins_user_id):
-        get_user_list = requests.get('http://'+server_url+'/role-strategy/strategy/getRole?type='+role_type+'&roleName='+role_name,
-            auth=(login_user,access_token), headers=self._jheader)
+        get_user_list = requests.get(server_url+'/role-strategy/strategy/getRole?type='+role_type+'&roleName='+role_name,
+            auth=(login_user,access_token), headers=self._jheader, proxies=self._proxy, verify=False)
         
         user_list = get_user_list.json()
         if user_list:
@@ -147,8 +154,8 @@ class JenkinsUserRole(object):
                 'roleName':role_name,
                 'sid':jenkins_user_id
             }
-            requests.post('http://'+server_url+'/role-strategy/strategy/unassignRole', auth=(login_user,access_token),
-                headers=self._jheader, data=data)
+            requests.post(server_url+'/role-strategy/strategy/unassignRole', auth=(login_user,access_token),
+                headers=self._jheader, proxies=self._proxy, verify=False, data=data)
 
         except Exception as e:
             self._module.fail_json(msg="Failed to remove the assignment of the role from the user: %s: %s" % (jenkins_user_id, e))
@@ -159,6 +166,7 @@ def main():
             api_token=dict(type='str', required=True, no_log=True),
             login_user=dict(type='str', required=True),
             server_url=dict(type='str', required=True),
+            proxy_server=dict(type='str', required=False),
             jenkins_user=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             role_type=dict(typr='str', required=True, choices=['global role', 'item role']),
@@ -169,6 +177,7 @@ def main():
     api_token = module.params['api_token']
     login_user = module.params['login_user']
     server_url = module.params['server_url']
+    proxy_server = module.params['proxy_server']
     jenkins_user = module.params['jenkins_user']
     state = module.params['state']
     role_type = module.params['role_type']
@@ -181,11 +190,18 @@ def main():
     }
     role_type = jenkins_role_type[role_type]
     
+    proxy = {}
+
+    if proxy_server:
+        proxy = {
+            'https': proxy_server
+        }
+
     header = {}
     # generate a crumb token
     try:
-        crumb_info = requests.get('http://'+server_url+'/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)',
-            auth=(login_user,api_token))
+        crumb_info = requests.get(server_url+'/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)',
+            auth=(login_user,api_token), proxies=proxy, verify=False)
         
         # store the issued crumb and session for the user in header dict to be used in API calls
         # session key & value
@@ -206,7 +222,7 @@ def main():
     except Exception as e:
         module.fail_json(msg="Failed to generate a CRUMB token to be used besides API token to authenticate and make the requested changes on Jenkins server  %s" % e)
 
-    roles = JenkinsUserRole(module, header)
+    roles = JenkinsUserRole(module, header, proxy)
 
     does_role_exist = roles.check_role_exists(server_url, login_user, api_token, role_type, role_name)
     is_role_assigned_to_user = roles.check_user_role_assignment(server_url, login_user, api_token, role_name, role_type, jenkins_user)
