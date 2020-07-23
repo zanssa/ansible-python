@@ -1,0 +1,7 @@
+csv_data:
+- jenkins_user: username
+  role_name: role name
+  role_type: item role
+- jenkins_user: username
+  role_name: role name
+  role_type: global role
