@@ -1,11 +1,12 @@
 # file: statuspage_user_removal_playbook.yml
 - name: Manage the creation and the removal of a user account on StatusPage | Remove a user account from StatusPage
     
-vars_files:
-  - ../roles/statuspage/vars/statuspage_auth_info.yml
+  vars_files:
+    - ../roles/statuspage/vars/statuspage_auth_info.yml
+    - ../roles/statuspage/vars/statuspage_user_removal_data.yml
 
   hosts:
-  - localhost
+    - localhost
 
-tasks:
-  - import_tasks: ../roles/statuspage/tasks/statuspage_user_removal.yml
+  tasks:
+    - import_tasks: ../roles/statuspage/tasks/statuspage_user_removal.yml
