@@ -1,0 +1,7 @@
+csv_data:
+- email: example@example.com
+  firstname: User
+  lastname: Example
+  password: 123456
+  phone: '5554445555'
+  username: username1
