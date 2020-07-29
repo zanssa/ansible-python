@@ -1,0 +1,52 @@
+# file: dyn_user_removal.yml
+- name: User Management on Dyn | Establish a Session on Dyn to yield a Token
+  uri:
+    url: 'https://api.dynect.net/REST/Session/'
+    user: "{{ dyn_login_user }}"
+    password: "{{ dyn_api_password }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    method: POST
+    headers:
+        Content-Type: 'application/json'
+    body_format: json
+    body:
+        customer_name: "{{ dyn_customer_name }}"
+        user_name: "{{ dyn_login_user }}"
+        password: "{{ dyn_api_password }}"
+    validate_certs: no
+    return_content: yes
+  register: session_info
+
+- name: User Management on Dyn | Create a variable to store Auth Token
+  set_fact:
+    dyn_auth_token: "{{session_info.json.data.token }}"
+
+- name: User Management on Dyn | Delete a User account on Dyn
+  uri:
+    url: 'https://api.dynect.net/REST/User/{{ item.username }}/'
+    user: "{{ dyn_login_user }}"
+    password: "{{ dyn_api_password }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    method: DELETE
+    headers:
+        Content-Type: 'application/json'
+        Auth-Token: '{{ dyn_auth_token }}'
+    validate_certs: no
+    return_content: yes
+  loop: "{{ csv_data }}"
+
+- name: User Management on Dyn | End the API Session on Dyn
+  uri:
+    url: 'https://api.dynect.net/REST/Session/'
+    user: "{{ dyn_login_user }}"
+    password: "{{ dyn_api_password }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    method: DELETE
+    headers:
+        Content-Type: 'application/json'
+        Auth-Token: '{{ dyn_auth_token }}'
+    validate_certs: no
+    return_content: yes
