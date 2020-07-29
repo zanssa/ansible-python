@@ -1,32 +1,33 @@
 # file: statuspage_user_removal.yml
-- name: Manage the creation and the removal of a user account on StatusPage | Get User ID
+- name: Manage the creation and the removal of a user account on StatusPage | Get a List of Users on StatusPage
   uri:
-    url: "{{ statuspage_api_user_creation }}"
+    url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users"
     method: GET
     headers:
-        Authorization: "Authorization: OAuth {{ authorization_oauth }}"
+        Authorization: "Authorization: OAuth {{ sp_authorization_oauth }}"
     body_format: json
     status_code: 200
     return_content: yes
+    validate_certs: no
   register: get_users_response
 
-- name: Manage the creation and the removal of a user account on StatusPage | Print User ID returned from the previous task
-  debug:
-    var: get_users_response.json.id 
-  # this is based on the result returned when creating incidents but, 
-  # I would need to see the returned result to be able to filter out the result and get the user id for a specific user
-
-- name: Manage the creation and the removal of a user account on StatusPage | Set User ID returned as a variable for next task
+- name: Manage the creation and the removal of a user account on StatusPage | Set a List of the User Ids to Pass to Delete Request
   set_fact:
-    user_id: get_users_response.json.id
+    user_id: "{{ user_id }} + [ '{{ item[0].id }}' ]"
+  with_nested: 
+    - "{{ get_users_response.json }}"
+    - "{{ csv_data }}"
+  when: item[0].email == item[1].email
+  vars:
+    user_id: []
 
 - name: Manage the creation and the removal of a user account on StatusPage | Delete a user account from StatusPage
   uri:
-    url: "{{ statuspage_api_user_creation }}/{{ user_id }}"
+    url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users/{{ item }}"
     method: DELETE
     headers:
-        Authorization: "Authorization: OAuth {{ authorization_oauth }}"
-    body_format: json
-    body:
+      Authorization: "Authorization: OAuth {{ sp_authorization_oauth }}"
     status_code: 200
     return_content: yes
+    validate_certs: no
+  loop: "{{ user_id }}"

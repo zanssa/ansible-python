@@ -1,10 +1,10 @@
 # file: statuspage_user_creation.yml
 - name: Manage the creation and the removal of a user account on StatusPage | Create a user account on StatusPage
   uri:
-    url: "{{ statuspage_api_user_creation }}"
+    url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users"
     method: POST
     headers:
-      Authorization: "Authorization: OAuth {{ authorization_oauth }}"
+      Authorization: "Authorization: OAuth {{ sp_authorization_oauth }}"
     body_format: json
     body:
       user:
@@ -14,11 +14,6 @@
         last_name: "{{ item.last_name }}"
     status_code: 201
     return_content: yes
+    validate_certs: no
   loop: "{{ csv_data }}" 
   register: user_response
-
-- name: Manage the creation and the removal of a user account on StatusPage | Print out Users Ids 2
-  debug:
-    msg: "User ID: {{ user_response.json.id }}"
-  # this is based on the result returned when creating incidents but, 
-  # I would need to see the returned result to be able to filter out the result and get the user id for a specific user

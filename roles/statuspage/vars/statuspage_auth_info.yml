@@ -1,2 +1,0 @@
-authorization_oauth: 
-statuspage_api_user_creation: https://api.statuspage.io/v1/organizations/{org id}/users
