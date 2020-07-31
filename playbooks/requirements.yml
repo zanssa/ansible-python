@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  connection: local
+  name: Install requirments on Ansible Controller
+    
+  tasks:
+    - name: Install Python library dependencies
+      pip:
+        name: 
+            - "{{ item }}"
+      with_items:
+        - jmespath
+        - python-gitlab
+        - zabbix-api
+        - pdpyras
