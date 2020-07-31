@@ -96,17 +96,14 @@ class GitLabGroup(object):
 
     # check if user exists
     def does_user_exist(self, gitlab_user):
-        result = self._gitlab.users.list(username=gitlab_user)[0]
-        return result
+        return self._gitlab.users.list(username=gitlab_user)[0]
 
     # check if group exists
     def does_group_exist(self, gitlab_group):
-        result = self._gitlab.groups.list(search=gitlab_group)[0]
-        return result
+        return self._gitlab.groups.list(search=gitlab_group)[0]
 
     # check if the user is a member of the group
     def is_user_a_member(self, gitlab_group_id, gitlab_user_id):
-        members = []
         group = self._gitlab.groups.get(gitlab_group_id)
         members = group.members.list()
         for member in members:
