@@ -1,0 +1,1 @@
+This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of tools for SRE-P.
