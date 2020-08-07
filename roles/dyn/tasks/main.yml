@@ -1,4 +1,4 @@
-#file: dyn_user_creation.yml
+# file: ~/ansible-sre/roles/dyn/tasks/main
 - name: User Management on Dyn | Establish a Session on Dyn to yield a Token
   uri:
     url: 'https://api.dynect.net/REST/Session/'
@@ -17,10 +17,14 @@
     validate_certs: no
     return_content: yes
   register: session_info
+  tags: 
+    - always
 
 - name: User Management on Dyn | Create a variable to store Auth Token
   set_fact:
     dyn_auth_token: "{{session_info.json.data.token }}"
+  tags: 
+    - always
 
 - name: User Management on Dyn | Create an API User Account on Dyn
   uri:
@@ -45,10 +49,14 @@
     validate_certs: no
     return_content: yes
   loop: "{{ csv_data }}"
+  tags: 
+    - user_addition
 
 - name: User Management on Dyn | Create a variable to Store a list of the Groups on Dyn
   set_fact: 
     dyn_groups: "['ADMIN', 'OWNER', 'TECH', 'UPDATE']"
+  tags:
+    - user_addition
 
 - name: User Management on Dyn | Add an API User to Groups on Dyn
   uri:
@@ -66,6 +74,42 @@
   with_nested:
     - "{{ csv_data }}"
     - "{{ dyn_groups }}"
+  tags:
+    - user_addition
+
+- name: User Management on Dyn | Delete a User account on Dyn
+  uri:
+    url: 'https://api.dynect.net/REST/User/{{ item.username }}/'
+    user: "{{ dyn_login_user }}"
+    password: "{{ dyn_api_password }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    method: DELETE
+    headers:
+        Content-Type: 'application/json'
+        Auth-Token: '{{ dyn_auth_token }}'
+    validate_certs: no
+    return_content: yes
+  loop: "{{ csv_data }}"
+  tags:
+    - user_removal
+  
+- name: User Management on Dyn | Delete the user contact info on Dyn
+  uri:
+    url: 'https://api.dynect.net/REST/Contact/{{ item.username }}/'
+    user: "{{ dyn_login_user }}"
+    password: "{{ dyn_api_password }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    method: DELETE
+    headers:
+        Content-Type: 'application/json'
+        Auth-Token: '{{ dyn_auth_token }}'
+    validate_certs: no
+    return_content: yes
+  loop: "{{ csv_data }}"
+  tags:
+    - user_removal
 
 - name: User Management on Dyn | End the API Session on Dyn
   uri:
@@ -80,3 +124,5 @@
         Auth-Token: '{{ dyn_auth_token }}'
     validate_certs: no
     return_content: yes
+  tags: 
+    - always
