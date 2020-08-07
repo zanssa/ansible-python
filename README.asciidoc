@@ -1,1 +1,575 @@
+:toc:
+:toclevels: 6
+
+= Ansible-SRE
+
+
+toc::[]
+
+== Description
+
 This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of tools for SRE-P.
+
+== Requirements
+
+Requires `Ansible` to be installed on the control node. You can follow https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html[this] guide to help you with the installation based on the OS you are running.
+
+== Dependencies
+
+Besides Ansible, there are some dependencies that need to be installed as well before running the playbooks with the customized modules. +
+To do so, +
+
+* Clone the `ansible-sre` Gitlab repository to ensure you have the latest changes.
+
+TIP: To clone through SSH: ``git@gitlab.cee.redhat.com:srep-onboarding/ansible-sre.git``
+
+* On a Terminal, navigate to the directory, `ansible-sre` and run the following cmd:
+
+`ansible-playbook playbooks/requirements.yml`
+
+
+
+== Directory structure
+
+== Ansible Custom Modules
+
+=== Zabbix User Management
+
+==== zabbix_user
+
+This is a custom Ansible module built to manage the creation of a user account on Zabbix when state is defined as present, update of an existing user account information when state is present with
+an option of forcing the update to replace the current configuration or keeping it while configuring the new changes, and manage the removal of a user account when state is defined as absent.
+
+**Requirements**
+
+The below requirements are needed on the host that executes this module:
+
+* python >=2.6
+* zabbix-api >= 0.5.4
+
+TIP: for installing Zabbix python library: `pip install zabbix-api` +
+more information about the library can be found https://pypi.org/project/zabbix-api/[here]
+
+**Parameters**
+
+.zabbix_user Parameters
+[cols=3*,options="header",width=50%]
+|===
+|Parameters   |Choices/Default |Comments
+|user_name +
+(string/required)||Name of the user in Zabbix.
+|user_groups +
+(list /element=string /required)
+||List of user groups the user is a member of. Required when creating a new user account
+|user_passwd +
+(string/required)||User’s password. Required when creating a new user account
+|server_url +
+(string/required)
+||URL of a Zabbix server
+|login_user +
+(string/required)||A user account with admin privileges to authenticate with Zabbix server.
+|login_password||User’s password to authenticate with Zabbix server
+|State|Choices: +
+- *present* +
+- absent
+|State of the user. +
+On *present*, it will create a user if the user doesn't exist or update the user if the associated data is different. +
+On *absent*, will remove a user if the account exists.
+|Force|Choices: +
+- *yes* +
+- no
+|Overwrite the user configuration, even if already present.
+|Name +
+(String)||Name of the user.
+|Surname +
+(String)||Surname of the user
+|lang +
+(string)| Choices: +
+- *en_GB* +
+- en_US +
+- zh_CN +
+- cs_CZ +
+- fr_FR +
+- it_IT +
+- ko_KR +
+- ja_JP +
+- nb_NO +
+- pl_PL +
+- pt_BR +
+- ru_RU +
+- sk_SK +
+- tr_TR +
+- uk_UA
+|Language code of the user’s language
+|Autologin +
+(int)|Choices: +
+- *0* +
+- 1
+|Whether to enable auto-login +
+- Numerical values are accepted for this parameter. +
+- Auto-login disabled (0) default, Auto-login enabled (1)
+|Autologout +
+(String)|Default: 15m|User session lifetime. +
+Accepts second and time unit with suffix. +
+If set to 0s, the session will never expire.
+|refresh +
+(string)|Default: 30s|Automatic refresh period. +
+Accepts second and time unit with suffix.
+|rows_per_page +
+(string)|Default: 50|Amount of object rows to show per page.
+|Theme +
+(String)|Choices: +
+- *default* +
+- blue-theme +
+- dark-theme
+|User’s theme.
+|zabbix_user_type +
+(string)|Choices: +
+- *Zabbix user* +
+- Zabbix admin +
+- Zabbix super admin
+|Type of the user.
+|url +
+(string)||URL of the page to redirect the user after logging in.
+|Medias +
+(list/elements=dict)|Default: []|
+|mediatype +
+(string)|Choices: +
+- *Email* +
+- Discord +
+- Mattermost +
+- Slack +
+- SMS +
+- PagerDuty +
+- Opsgenie +
+- Pushover
+|Media type name. +
+Required if active=0, user's media is set to be enabled. 
+|sentto +
+(string)||Address, username or other identifiers of the recipient. +
+Required if active=0, user's media is set to be enabled.
+|Period +
+(String)|Default: '1-7,00:00-24:00' |Time when the notifications can be sent as a time period or user macros separated by a semicolon.
+|severity +
+(dict\elements=bool)| Default: +
+- not_classified: true +
+- information: true +
+- warning: true +
+- average: true +
+- high: true +
+- disaster: true | Trigger severities to send notifications about.
+|Not_classified +
+Bool
+|Choices: +
+• *True* +
+• False |
+|Information +
+Bool
+|Choices: +
+• *True* +
+• False |
+|Warning +
+Bool
+|Choices: +
+• *True* +
+• False |
+|Average +
+Bool
+|Choices: +
+• *True* +
+• False |
+|High +
+Bool
+|Choices: +
+• *True* +
+• False |
+|Disaster +
+Bool
+|Choices: +
+• *True* +
+• False |
+|active +
+(int)|Choices: +
+- *0* +
+- 1 |Whether the media is enabled. +
+0 (enabled, default), 1 (disabled)
+|new_passwd +
+(string)||An updated user’s password.
+|===
+
+==== Notes
+
+* The module is written in python and follows the standard format as explained https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html[here]
+* The module can be used by ansible-playbook and it has been tested on that. Due to the development of Zabbix API, this module is fully functional with Zabbix server version 4.4 and higher. In case there is a need of updating a media configuration for a user account on Zabbix
+server running a version older than 4, it will fail as there will be a need to call a different function, which is user.updateprofile. More information can be found https://www.zabbix.com/documentation/3.0/manual/api/reference/user/update[here]. However, there should be no issue when using it for creating or deleting a user account.
+* In case that the word ‘zabbix’ is used as a value of ‘login_password’ parameter, the word will be replaced by ***** in all module output as a result of using ‘no_log’ option while declaring the parameter in Ansible module. More info can be found in https://docs.ansible.com/ansible/latest/network/user_guide/faq.html#why-is-my-output-sometimes-replaced-with[here].
+* **supports_check_mode** is allowed in this module, which will help in reporting whether changes occur or not.
+
+==== Examples
+
+[,yaml]
+----
+- name: Create a new user or update an existing user's info
+  zabbix_user:
+    server_url: http://monitor.zabbix.com 
+    login_user: Admin
+    login_passwd: Admin's passwd
+    user_name: username
+    name: Example
+    surname: User
+    user_passwd: password
+    user_groups:
+        - Example group1
+        - Example group2
+    lang: en_US
+    autologin: 0
+    autologout: '15m'
+    refresh: '30s'
+    rows_per_page: 50
+    theme: 'dark-theme'
+    url: http://url.after.login.to.monitor.zabbix.com
+    medias:
+        - mediatype: Email
+          sendto: username@example.com
+          period: '1-7,00:00-24:00'
+          severity:
+            not_classified: yes
+            information: no
+            warning: yes
+            average: no
+            high: yes
+            disaster: yes
+          active: 0
+    zabbix_user_type: Zabbix user
+    state: present
+
+- name: Update an existing user's groups setting
+  zabbix_user:
+    server_url: http://monitor.zabbix.com
+    login_user: Admin
+    login_passwd: Admin's passwd
+    user_name: username
+    name: Example
+    user_groups:
+        - Example group1
+        - Example group2
+        - Example group3
+    force: no
+
+- name: Delete a user account
+  zabbix_user:
+    server_url: http://monitor.zabbix.com
+    login_user: Admin
+    login_passwd: Admin's passwd
+    user_name: username
+    state: absent
+    
+----
+
+---
+
+=== GitLab MemberShip Management
+
+==== Gitlab_group_members
+
+This is a custom Ansible module built to manage the addition of a user on GitLab to a group when state is defined as present, and manage the removal of a user from a GitLab group when state is defined as absent.
+
+**Requirements**
+
+The below requirements are needed on the host that executes this module:
+
+* python >=2.6
+* ‘python-gitlab’ Python module <=1.15.0
+
+TIP: for installing Zabbix python library: `pip install python-gitlab` +
+more information about the library can be found https://python-gitlab.readthedocs.io/en/stable/[here]
+
+* Administrator rights on the GitLab Server.
+
+.gitlab_group_membership Parameters
+[cols=3*,options="header",width=50%]
+|===
+|Parameters   |Choices/Default |Comments
+|gitlab_user +
+(string/required) | |The username of the member you want to add to a GitLab group.
+|gitlab_groups +
+(string/required)||The name of the GitLab group you want to add a member to.
+|access_token +
+(string/required)||A personal access token to authenticate with GitLab API.
+|server_url +
+(string/required)||URL of a GitLab server.
+|access_level +
+(string/required)||The access level for the user. Required when adding a user to a group
+|State|Choices: +
+- present +
+- absent|State of the user. +
+On *present*, it will add a user to the group if the user isn’t a member. +
+On *absent*, will remove a user from the group if the user is a member.
+|===
+
+==== Notes
+
+* The module is written in python and follows the standard format as explained https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html[here].
+* The module can be used by ansible-playbook and it has been tested on that.
+* **supports_check_mode** is allowed in this module, which will help in reporting whether changes occur or not.
+
+==== Examples
+
+[,yaml]
+----
+
+- name: Add a user to a GitLab Group
+  gitlab_group_members:
+    server_url: 'https://gitlab.example.com'
+    access_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_user: username
+    access_level: developer
+    state: present
+
+- name: Remove a user from a GitLab Group
+  gitlab_group_members:
+    server_url: 'https://gitlab.example.com'
+    access_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_user: username
+    state: absent
+
+----
+---
+
+=== PagerDuty User Management
+
+==== pagerduty_user
+
+This is a custom Ansible module built to manage the creation of a user on PagerDuty when state is defined as present, and manage the removal of a user from PagerDuty when state is defined as absent.
+
+**Requirements:**
+
+The below requirements are needed on the host that executes this module:
+
+* python >=2.6
+* ‘pdpyras’ Python module = 4.1.1
+
+TIP: for installing PagerDuty python library: `pip install pdpyras` +
+more information about the library can be found https://pagerduty.github.io/pdpyras/[here]
+
+* PagerDuty API Access.
+
+.pagerduty_user Parameters
+[cols=3*,options="header",width=50%]
+|===
+|Parameters   |Choices/Default |Comments
+|pd_user +
+(string/required)||Name of the user in PagerDuty.
+|pd_email +
+(string/required)||The user’s email address. This is the unique identifier used and cannot be updated using this module.
+|access_token +
+(string/required)||An API access token to authenticate with PagerDuty REST API.
+|pd_role +
+(string)|Choices: +
+- global admin +
+- manager +
+- *responder* +
+- observer +
+- stakeholder +
+- limited stakeholder +
+- restricted access|The user’s role.
+|pd_team +
+(list/elements=string)||The access level for the user. Required when creating a user on PagerDuty
+|State|Choices: +
+- present +
+- absent|State of the user. +
+On *present*, it will add a user to the group if the user isn’t a member. +
+On *absent*, will remove a user from the group if the user is a member.
+|===
+
+==== Notes
+
+* The module is written in python and follows the standard format as explained 
+* The module can be used by ansible-playbook and it has been tested on that.
+* *supports_check_mode* is allowed in this module, which will help in reporting whether changes occur or not.
+
+==== Examples
+
+[,yaml]
+----
+
+- name: Create a user account on PagerDuty
+  pagerduty_user:
+    access_token: 'Your_Access_token'
+    pd_user: user_full_name
+    pd_email: user_email
+    pd_role: user_pd_role
+    pd_team: user_pd_team
+    state: present
+    
+- name: Remove a user account from PagerDuty
+  pagerduty_user:
+    access_token: 'Your_Access_token'
+    pd_user: user_full_name
+    pd_email: user_email
+    state: absent
+----
+
+---
+
+=== Jenkins User Permissions and Roles Management
+
+==== jenkins_user_role
+
+This is a custom Ansible module built to manage the assignment of a role to a user on Jenkins when state is defined as present, and manage the removal of a role assignment from a user when state is defined as absent.
+
+**Requirements**
+
+The below requirements are needed on the host that executes this module:
+
+* python >=2.6
+* Jenkins API Access.
+* Administrative rights to manage Role-based Authorization Strategy Plugin on Jenkins Server.
+
+**Parameters**
+
+.jenkins_user_role Parameters
+[cols=3*,options="header",width=50%]
+|===
+|Parameters   |Choices/Default |Comments
+|jenkins_user +
+(string/required)||Name of the user in Jenkins Server
+|server_url +
+(string/required)  ||URL of a Jenkins server
+|login_user +
+(string/required)  ||A user account with admin privileges to authenticate with Jenkins server
+|access_token +
+(string/required)||An API access token to authenticate with Jenkins REST API
+|role_type +
+(string/required)|Choices: +
+- *global role* + 
+- item role |The type of the role on Jenkins server
+|role_name +
+(string/required)||Name of the role on Jenkins server
+|State |Choices: +
+- present +
+- absent |State of the user. +
+On **present**, it will assign a role to a user if the assignment doesn’t exist. +
+On **absent**, will remove the assignment of a role from a user if it exists
+|===
+
+==== Notes
+
+* The module is written in python and follows the standard format as explained https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html[here]
+* The module can be used by ansible-playbook and it has been tested on that.
+* *supports_check_mode* is allowed in this module, which will help in reporting whether changes occur or not.
+
+==== Examples
+
+[,yaml]
+----
+
+- name: Assign a Role to a Jenkins User
+  jenkins_user_role:
+    server_url: 'your_server_url:port_num'
+    api_token: 'your_api_access_token'
+    login_user: admin
+    proxy_server: proxy_server_url:port_num
+    jenkins_user: example1
+    role_type: global role
+    role_name: authenticated
+    state: present
+
+- name: Remove a Role from a Jenkins User
+  jenkins_user_role:
+    server_url: 'your_server_url:port_num'
+    api_token: 'your_api_access_token'
+    login_user: admin
+    jenkins_user: example1
+    role_type: global role
+    role_name: authenticated
+    state: absent
+
+----
+
+---
+
+=== Parsing CSV files into YAML files
+
+==== parsing_csv_into_ansible_vars
+
+This is a custom Ansible module built to create a variable file for ansible playbook.
+
+**Requirements**
+
+The below requirements are needed on the host that executes this module:
+
+* python >=2.6
+
+**Parameters**
+
+.parsing_csv_into_ansible_vars Parameters
+[cols=2*,options="header",width=50%]
+|===
+|Parameters |Comments
+|csv_file +
+(str/required)|A CSV file name.
+|yaml_file +
+(str/required)|A yml file name.
+|===
+
+==== Notes
+
+* The module is written in python and follows the standard format as explained https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html[here]
+* The module can be used by ansible-playbook and it has been tested on that.
+* *supports_check_mode* is allowed in this module, which will help in reporting whether changes occur or not.
+
+==== Examples
+
+[,yaml]
+----
+
+- name: Parsing a CSV file into an Ansible varible file
+  parsing_csv_into_ansible_vars:
+    csv_file: example.csv
+    yaml_file: example.yml
+
+
+----
+
+---
+
+== SRE-P Joiner Processes
+
+Below are the instructions for adding user accounts and granting them access on different apps once they join SRE Team:
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/zabbix.asciidoc#add-a-user-to-zabbix[Add a user to Zabbix]
+
+* https://github.com/openshift/ops-sop/blob/master/services/pagerduty.asciidoc#changes-to-pagerduty-accounts[Changes to PagerDuty Accounts - Add a User to PagerDuty]
+
+* https://github.com/openshift/ops-sop/blob/master/services/gitlab.asciidoc[Changes to GitLab Group Memberships - Add a user to Gitlab Group]
+
+* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-accounts[Changes to Jenkins Accounts]
+
+* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-permission-assignments[Changes to Jenkins Permission Assignments]
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/statuspage.asciidoc#add-a-user-to-statuspage[Add a User to StatusPage]
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/dyn.asciidoc#adding-an-api-user-to-dyn[Adding an API user to Dyn]
+
+---
+
+== SRE-P Leaver Processes
+
+Below are the instructions for removing user accounts and their access on different apps once they leave SRE Team:
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/zabbix.asciidoc#remove-a-user-from-zabbix[Remove a user from Zabbix]
+
+* https://github.com/openshift/ops-sop/blob/master/services/pagerduty.asciidoc#changes-to-pagerduty-accounts[Changes to PagerDuty Accounts - Remove a User from PagerDuty]
+
+* https://github.com/openshift/ops-sop/blob/master/services/gitlab.asciidoc[Changes to GitLab Group Memberships - Remove a user from a Gitlab Group]
+
+* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-accounts[Changes to Jenkins Accounts]
+
+* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-permission-assignments[Changes to Jenkins Permission Assignments]
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/dyn.asciidoc#removing-an-api-user-from-dyn[Removing an API user from Dyn]
+
+* https://github.com/openshift/ops-sop/blob/master/changes/accounts/statuspage.asciidoc#remove-a-user-from-statuspage[Remove a User from StatusPage]
