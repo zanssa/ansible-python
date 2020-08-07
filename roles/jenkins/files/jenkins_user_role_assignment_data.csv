@@ -1,5 +1,0 @@
-jenkins_user,role_type,role_name
-test,global role,admin
-jaffar,item role,buildvm_remote
-jaffar,global role,admin
-test,global role,sre_provision_reader

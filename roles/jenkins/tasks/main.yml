@@ -1,3 +1,4 @@
+# file: ~/ansible-sre/roles/jenkins/tasks/main
 - name: User Management on Jenkins Server | Generate a CRUMB token to be used besides API token to authenticate and make the requested changes on Jenkins server
   uri:
     url: '{{ jenkins_server_url }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'

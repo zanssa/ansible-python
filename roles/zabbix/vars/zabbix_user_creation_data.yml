@@ -1,5 +1,0 @@
-csv_data:
-- {firstname: test1, lastname: test11, password: '123456', type: 'Zabbix user', usergroups: Guests,
-  username: username1}
-- {firstname: test2, lastname: test22, password: '123456', type: 'Zabbix user', usergroups: 'Guests,Zabbix
-    administrators', username: username2}

@@ -1,5 +1,0 @@
-csv_data:
-- first_name: test
-  last_name: user
-  user_email: test1@test.edu
-  user_password: '123456'

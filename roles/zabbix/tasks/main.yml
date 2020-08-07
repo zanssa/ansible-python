@@ -1,4 +1,4 @@
-# file: zabbix_user_creation.yml
+# file: ~/ansible-sre/roles/dyn/tasks/main
 - name: Zabbix User Management | Create a user account on Zabbix Without Media
   zabbix_user:
     server_url: "{{ zabbix_server_url }}"

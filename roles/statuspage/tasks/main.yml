@@ -1,3 +1,4 @@
+# file: ~/ansible-sre/roles/statuspage/tasks/main
 - name: Manage the creation and the removal of a user account on StatusPage | Create a user account on StatusPage
   uri:
     url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users"
