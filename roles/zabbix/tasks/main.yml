@@ -1,0 +1,55 @@
+# file: zabbix_user_creation.yml
+- name: Zabbix User Management | Create a user account on Zabbix Without Media
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    user_name: "{{ item.username }}"
+    name: "{{ item.firstname }}"
+    surname: "{{ item.lastname }}"
+    user_passwd: "{{ item.password }}"
+    user_groups: "{{ item.zabbix_groups }}"
+    zabbix_user_type: "{{ item.zabbix_user_type }}"
+    state: present
+  loop: "{{ csv_data }}"
+  tags: 
+    - user_addition
+
+- name: Zabbix User Management | Create a user account on Zabbix with Media
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    user_name: "{{ item.username }}"
+    name: "{{ item.firstname }}"
+    surname: "{{ item.lastname }}"
+    user_passwd: "{{ item.password }}"
+    user_groups: "{{ item.zabbix_groups }}"
+    zabbix_user_type: "{{ item.zabbix_user_type }}"
+    medias:
+      - mediatype: 'PagerDuty'
+        sendto: "{{ item.email }}"
+        period: '1-7,00:00-24:00'
+        severity:
+          not_classified: yes
+          information: yes
+          warning: yes
+          average: no
+          high: yes
+          disaster: yes
+        active: 0
+    state: present
+  loop: "{{ csv_data }}"
+  tags:
+    - user_addition_with_media
+
+- name: Zabbix User Management | Delete a user account from Zabbix
+  zabbix_user: 
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    user_name: "{{ item.username }}"
+    state: absent
+  loop: "{{ csv_data }}"
+  tags: 
+    - user_removal

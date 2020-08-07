@@ -1,0 +1,43 @@
+# file: ~/ansible-sre/roles/gitlab/tasks/main
+- name: GitLab Group Members Management | Add a User to Service Delivery GitLab Group
+  gitlab_group_members:  
+    server_url: '{{ gitlab_server_url }}'
+    access_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: 'Service Delivery'
+    gitlab_user: '{{ item.username }}'
+    access_level: 'developer'
+    state: present
+  loop: "{{ csv_data }}"
+  register: group_members
+  tags: 
+    - user_addition
+
+- name: GitLab Group Members Management | Add a User to a GitLab Group
+  gitlab_group_members:  
+    server_url: '{{ gitlab_server_url }}'
+    access_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ item.gitlab_gname }}'
+    gitlab_user: '{{ item.username }}'
+    access_level: '{{ item.gitlab_accesslevel }}'
+    state: present
+  loop: '{{ csv_data }}'
+  register: group_members
+  tags: 
+    - user_addition_g
+  
+- name: GitLab Group Members Management | Remove a User from Service Delivery GitLab Group
+  gitlab_group_members:
+    server_url: '{{ gitlab_server_url }}'
+    access_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: 'Service Delivery'
+    gitlab_user: '{{ item.username }}'
+    state: absent
+  loop: "{{ csv_data }}"
+  register: group_members
+  tags: 
+    - user_removal
+
+- name: GitLab Group Members Management | Print out a report for the change made by the previous task
+  debug:
+    msg: "{{ group_members | json_query('results[*].result') }}"
+  tags: always

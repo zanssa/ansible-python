@@ -1,4 +1,23 @@
-# file: statuspage_user_removal.yml
+- name: Manage the creation and the removal of a user account on StatusPage | Create a user account on StatusPage
+  uri:
+    url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users"
+    method: POST
+    headers:
+      Authorization: "Authorization: OAuth {{ sp_authorization_oauth }}"
+    body_format: json
+    body:
+      user:
+        email: "{{ item.user_email }}"
+        password: "{{ item.user_password }}"
+        first_name: "{{ item.first_name }}"
+        last_name: "{{ item.last_name }}"
+    status_code: 201
+    return_content: yes
+    validate_certs: no
+  loop: "{{ csv_data }}"
+  tags:
+    - user_addition
+
 - name: Manage the creation and the removal of a user account on StatusPage | Get a List of Users on StatusPage
   uri:
     url: "https://api.statuspage.io/v1/organizations/{{ sp_organization_id }}/users"
@@ -10,6 +29,8 @@
     return_content: yes
     validate_certs: no
   register: get_users_response
+  tags:
+    - user_removal
 
 - name: Manage the creation and the removal of a user account on StatusPage | Set a List of the User Ids to Pass to Delete Request
   set_fact:
@@ -20,6 +41,8 @@
   when: item[0].email == item[1].email
   vars:
     user_id: []
+  tags:
+    - user_removal
 
 - name: Manage the creation and the removal of a user account on StatusPage | Delete a user account from StatusPage
   uri:
@@ -31,3 +54,5 @@
     return_content: yes
     validate_certs: no
   loop: "{{ user_id }}"
+  tags:
+    - user_removal

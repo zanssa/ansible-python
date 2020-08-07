@@ -1,0 +1,84 @@
+- name: User Management on Jenkins Server | Generate a CRUMB token to be used besides API token to authenticate and make the requested changes on Jenkins server
+  uri:
+    url: '{{ jenkins_server_url }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+    user: "{{ jenkins_login_user }}"
+    password: "{{ jenkins_api_access_token }}"
+    force_basic_auth: yes
+    return_content: yes
+    validate_certs: no
+  environment:
+    https_proxy: "{{ jenkins_proxy_server }}"
+  register: jenkins_crumb
+  tags:
+    - always
+
+- name: User Management on Jenkins Server | Create a User Account on Jenkins
+  uri:
+    url: '{{ jenkins_server_url }}/securityRealm/createAccountByAdmin'
+    user: "{{ jenkins_login_user }}"
+    password: "{{ jenkins_api_access_token }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    headers:
+        Jenkins-Crumb: "{{ jenkins_crumb.content.split(':')[1] }}"
+        Cookie: "{{ jenkins_crumb.set_cookie }}"
+    method: POST
+    body: '\
+        username={{ item.username }}&\
+        password1={{ item.password }}&\
+        password2={{ item.password }}&\
+        fullname={{ item.fullname }}&\
+        email={{ item.email }}'
+    validate_certs: no
+  environment:
+    https_proxy: "{{ jenkins_proxy_server }}"
+  loop: "{{ csv_data }}"
+  tags:
+    - user_addition
+
+- name: Jenkins User Management | Assign a Role to a Jenkins User
+  jenkins_user_role:
+    server_url: '{{ jenkins_server_url }}'
+    api_token: '{{ jenkins_api_access_token }}'
+    proxy_server: '{{ jenkins_proxy_server }}'
+    login_user: '{{ jenkins_login_user }}'
+    jenkins_user: '{{ item.username }}'
+    role_type: '{{ item.jenkins_role_type }}'
+    role_name: '{{ item.jenkins_role_name }}'
+    state: present
+  loop: "{{ csv_data }}"
+  tags:
+    - jrole_addition
+
+- name: Jenkins User Management | Remove a Role from a Jenkins User
+  jenkins_user_role:
+    server_url: '{{ jenkins_server_url }}'
+    api_token: '{{ jenkins_api_access_token }}'
+    proxy_server: '{{ jenkins_proxy_server }}'
+    login_user: '{{ jenkins_login_user }}'
+    jenkins_user: '{{ item.jenkins_user }}'
+    role_type: '{{ item.jenkins_role_type }}'
+    role_name: '{{ item.jenkins_role_name }}'
+    state: absent
+  loop: "{{ csv_data }}"
+  tags:
+    - jrole_removal
+
+- name: User Management on Jenkins Server | Delete a User Account from Jenkins
+  uri:
+    url: '{{ jenkins_server_url }}/user/{{ item.username }}/doDelete'
+    user: "{{ jenkins_login_user }}"
+    password: "{{ jenkins_api_access_token }}"
+    force_basic_auth: yes
+    follow_redirects: all
+    headers:
+        Jenkins-Crumb: "{{ jenkins_crumb.content.split(':')[1] }}"
+        Cookie: "{{ jenkins_crumb.set_cookie }}"
+    method: POST
+    validate_certs: no
+  environment:
+    https_proxy: "{{ jenkins_proxy_server }}"
+  loop:
+    - "{{ csv_data }}"
+  tags:
+    - user_removal  
