@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Zainab Alsaffar <zalsaffa@redhat.com>
+# Copyright: (c) 2020, Zainab Alsaffar <zanssa>
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],

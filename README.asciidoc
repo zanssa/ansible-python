@@ -1,14 +1,14 @@
 :toc:
 :toclevels: 6
 
-= Ansible-SRE
+= Ansible-Python
 
 
 toc::[]
 
 == Description
 
-This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of tools for SRE-P.
+This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of DevOos tools.
 
 == Requirements
 
@@ -19,15 +19,11 @@ Requires `Ansible` to be installed on the control node. You can follow https://d
 Besides Ansible, there are some dependencies that need to be installed as well before running the playbooks with the customized modules. +
 To do so, +
 
-* Clone the `ansible-sre` Gitlab repository to ensure you have the latest changes.
+* Clone this repository to ensure you have the latest changes.
 
-TIP: To clone through SSH: ``git@gitlab.cee.redhat.com:srep-onboarding/ansible-sre.git``
-
-* On a Terminal, navigate to the directory, `ansible-sre` and run the following cmd:
+* On a Terminal, navigate to the directory, `ansible-python` and run the following cmd:
 
 `ansible-playbook playbooks/requirements.yml`
-
-
 
 == Directory structure
 
@@ -493,7 +489,7 @@ On **absent**, will remove the assignment of a role from a user if it exists
 
 === Parsing CSV files into YAML files
 
-==== parsing_csv_into_ansible_vars
+==== csv_to_yaml
 
 This is a custom Ansible module built to create a variable file for ansible playbook.
 
@@ -505,7 +501,7 @@ The below requirements are needed on the host that executes this module:
 
 **Parameters**
 
-.parsing_csv_into_ansible_vars Parameters
+.csv_to_yaml Parameters
 [cols=2*,options="header",width=50%]
 |===
 |Parameters |Comments
@@ -527,49 +523,10 @@ The below requirements are needed on the host that executes this module:
 ----
 
 - name: Parsing a CSV file into an Ansible varible file
-  parsing_csv_into_ansible_vars:
+  csv_to_yaml:
     csv_file: example.csv
     yaml_file: example.yml
-
 
 ----
 
 ---
-
-== SRE-P Joiner Processes
-
-Below are the instructions for adding user accounts and granting them access on different apps once they join SRE Team:
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/zabbix.asciidoc#add-a-user-to-zabbix[Add a user to Zabbix]
-
-* https://github.com/openshift/ops-sop/blob/master/services/pagerduty.asciidoc#changes-to-pagerduty-accounts[Changes to PagerDuty Accounts - Add a User to PagerDuty]
-
-* https://github.com/openshift/ops-sop/blob/master/services/gitlab.asciidoc[Changes to GitLab Group Memberships - Add a user to Gitlab Group]
-
-* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-accounts[Changes to Jenkins Accounts]
-
-* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-permission-assignments[Changes to Jenkins Permission Assignments]
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/statuspage.asciidoc#add-a-user-to-statuspage[Add a User to StatusPage]
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/dyn.asciidoc#adding-an-api-user-to-dyn[Adding an API user to Dyn]
-
----
-
-== SRE-P Leaver Processes
-
-Below are the instructions for removing user accounts and their access on different apps once they leave SRE Team:
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/zabbix.asciidoc#remove-a-user-from-zabbix[Remove a user from Zabbix]
-
-* https://github.com/openshift/ops-sop/blob/master/services/pagerduty.asciidoc#changes-to-pagerduty-accounts[Changes to PagerDuty Accounts - Remove a User from PagerDuty]
-
-* https://github.com/openshift/ops-sop/blob/master/services/gitlab.asciidoc[Changes to GitLab Group Memberships - Remove a user from a Gitlab Group]
-
-* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-accounts[Changes to Jenkins Accounts]
-
-* https://github.com/openshift/ops-sop/blob/master/services/jenkins.asciidoc#changes-to-jenkins-permission-assignments[Changes to Jenkins Permission Assignments]
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/dyn.asciidoc#removing-an-api-user-from-dyn[Removing an API user from Dyn]
-
-* https://github.com/openshift/ops-sop/blob/master/changes/accounts/statuspage.asciidoc#remove-a-user-from-statuspage[Remove a User from StatusPage]

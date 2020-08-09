@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Zainab Alsaffar <zalsaffa@redhat.com>
+# Copyright: (c) 2020, Zainab Alsaffar <zanssa>
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],
@@ -60,6 +60,21 @@ notes: supports_check_mode is allowed in this module
 '''
 
 EXAMPLES = '''
+- name: Create a user account on PagerDuty
+  pagerduty_user:
+    access_token: 'Your_Access_token'
+    pd_user: user_full_name
+    pd_email: user_email
+    pd_role: user_pd_role
+    pd_team: user_pd_team
+    state: present
+
+- name: Remove a user account from PagerDuty
+  pagerduty_user:
+    access_token: 'Your_Access_token'
+    pd_user: user_full_name
+    pd_email: user_email
+    state: absent
 '''
 
 RETURN = '''

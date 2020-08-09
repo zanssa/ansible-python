@@ -1,3 +1,4 @@
-server_url: 'http/https://Server_URL:Port_Num'
-login_user: Your_username
-api_access_token: Your_Api_token
+jenkins_server_url: 'http/https://Server_URL:Port_Num'
+jenkins_login_user: Your_username
+jenkins_api_access_token: Your_Api_token
+jenkins_proxy_server: Your_Proxy_Server

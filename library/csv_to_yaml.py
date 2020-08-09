@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Zainab Alsaffar <zalsaffa@redhat.com>
+# Copyright: (c) 2020, Zainab Alsaffar <zanssa>
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],
@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.0',
 
 DOCUMENTATION = '''
 ---
-module: parsing_csv_into_ansible_vars:
+module: csv_to_yaml:
 short_description: Create a variable file for ansible playbook
 description:
     - This is a custom module built to create a yml varible file. 
@@ -32,7 +32,7 @@ notes: supports_check_mode is allowed in this module
 '''
 EXAMPLES = '''
 - name: Parsing a CSV file into an Ansible varible file
-  parsing_csv_into_ansible_vars:
+  csv_to_yaml:
   csv_file: example.csv
   yaml_file: example.yml
 '''

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Zainab Alsaffar <zalsaffa@redhat.com>
+# Copyright: (c) 2020, Zainab Alsaffar <zanssa>
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],
@@ -234,7 +234,7 @@ EXAMPLES = '''
     state: present
 
 - Update an existing user's groups setting
-  module: zabbix_user
+  zabbix_user:
     server_url: http://monitor.zabbix.com
     login_user: Admin
     login_passwd: Admin's passwd
@@ -247,7 +247,7 @@ EXAMPLES = '''
     force: no
 
 - name: Delete a user account
-  module: zabbix_user
+  zabbix_user:
     server_url: http://monitor.zabbix.com
     login_user: Admin
     login_passwd: Admin's passwd

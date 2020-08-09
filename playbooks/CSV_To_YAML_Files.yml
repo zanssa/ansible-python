@@ -5,6 +5,6 @@
 
   tasks:
     - name: Parsing a CSV file into A variable file
-      parsing_csv_into_ansible_vars:
-        csv_file: ../roles/dyn/files/dyn_user_creation_data.csv
-        yaml_file: ../roles/dyn/vars/dyn_user_creation_data.yml
+      csv_to_yaml:
+        csv_file: example.csv
+        yaml_file: example.yml
