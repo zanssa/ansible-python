@@ -8,7 +8,7 @@ toc::[]
 
 == Description
 
-This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of DevOos tools.
+This repo contains Ansible Custom Modules and Playbooks developed to help automate the management of user accounts and permissions on a varity of DevOps tools.
 
 == Requirements
 
